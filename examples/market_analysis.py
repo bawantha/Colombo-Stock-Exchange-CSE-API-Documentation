@@ -6,12 +6,11 @@ This script demonstrates how to perform market analysis using the CSE API.
 """
 
 import statistics
-from collections import defaultdict
 from datetime import datetime
 from typing import List, Dict, Any
 
 from cse_lk import CSEClient
-from cse_lk.models import SharePrice, DetailedTrade
+from cse_lk.models import SharePrice
 from cse_lk.exceptions import CSEError
 
 
@@ -195,14 +194,14 @@ def main():
         )
 
         stats = market_analysis["statistics"]
-        print(f"\n📊 Market Statistics:")
+        print("\n📊 Market Statistics:")
         print(f"  Total Stocks: {stats['total_stocks']}")
         print(f"  Average Price: LKR {stats['average_price']:.2f}")
         print(f"  Median Price: LKR {stats['median_price']:.2f}")
         print(f"  Price Volatility: {stats['price_std_dev']:.2f}")
 
         sentiment = market_analysis["market_sentiment"]
-        print(f"\n💭 Market Sentiment:")
+        print("\n💭 Market Sentiment:")
         print(f"  Gainers: {sentiment['gainers']} (+{sentiment['avg_gain']:.2f}% avg)")
         print(f"  Losers: {sentiment['losers']} ({sentiment['avg_loss']:.2f}% avg)")
         print(f"  Unchanged: {sentiment['unchanged']}")

@@ -1,9 +1,8 @@
 """Unit tests for the CSE client."""
 
 import pytest
-import requests
-from unittest.mock import Mock, patch, MagicMock
-from requests.exceptions import ConnectionError, Timeout, RequestException
+from unittest.mock import Mock, patch
+from requests.exceptions import ConnectionError, Timeout
 
 from cse_lk import CSEClient
 from cse_lk.exceptions import (
@@ -169,7 +168,7 @@ class TestCSEClient:
 
         assert isinstance(result, MarketStatus)
         assert result.status == "Market Open"
-        assert result.is_open == True
+        assert result.is_open is True
 
         mock_request.assert_called_once_with("marketStatus")
 
@@ -333,8 +332,8 @@ class TestDataModels:
         open_status = MarketStatus(status="Market Open")
         closed_status = MarketStatus(status="Market Closed")
 
-        assert open_status.is_open == True
-        assert closed_status.is_open == False
+        assert open_status.is_open is True
+        assert closed_status.is_open is False
 
 
 if __name__ == "__main__":

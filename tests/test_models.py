@@ -6,14 +6,7 @@ from cse_lk.models import (
     CompanyInfo,
     CompanyLogo,
     TradeSummary,
-    SharePrice,
-    TopGainer,
-    TopLoser,
-    ActiveTrade,
     MarketStatus,
-    MarketSummary,
-    IndexData,
-    Sector,
     DetailedTrade,
     DailyMarketSummary,
     Announcement,
@@ -142,24 +135,24 @@ class TestMarketStatus:
     def test_is_open_true(self):
         """Test is_open property when market is open."""
         status = MarketStatus(status="Market Open")
-        assert status.is_open == True
+        assert status.is_open is True
 
         status = MarketStatus(status="Pre-Market Open")
-        assert status.is_open == True
+        assert status.is_open is True
 
         status = MarketStatus(status="OPEN")
-        assert status.is_open == True
+        assert status.is_open is True
 
     def test_is_open_false(self):
         """Test is_open property when market is closed."""
         status = MarketStatus(status="Market Closed")
-        assert status.is_open == False
+        assert status.is_open is False
 
         status = MarketStatus(status="CLOSED")
-        assert status.is_open == False
+        assert status.is_open is False
 
         status = MarketStatus(status="Suspended")
-        assert status.is_open == False
+        assert status.is_open is False
 
     def test_from_dict(self):
         """Test creating MarketStatus from dictionary."""

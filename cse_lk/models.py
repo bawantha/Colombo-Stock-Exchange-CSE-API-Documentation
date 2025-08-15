@@ -1,7 +1,7 @@
 """Data models for CSE API responses."""
 
 from dataclasses import dataclass
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, Dict, Any
 from datetime import datetime
 
 

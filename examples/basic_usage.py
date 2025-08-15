@@ -25,7 +25,7 @@ def main():
         print(f"Company: {company.name}")
         print(f"Symbol: {company.symbol}")
         print(f"Last Price: LKR {company.last_traded_price}")
-        print(f"Change: {company.change:+.2f} ({company.change_percentage:+.2f}%)")
+        print(f"Change: {company.change:+.2f} " f"({company.change_percentage:+.2f}%)")
         if company.logo:
             print(f"Logo: {company.logo.full_url}")
 
@@ -36,7 +36,8 @@ def main():
         print(f"Market Status: {overview['status'].status}")
         print(f"ASPI: {overview['aspi'].value:.2f} ({overview['aspi'].change:+.2f})")
         print(
-            f"S&P SL20: {overview['snp_sl20'].value:.2f} ({overview['snp_sl20'].change:+.2f})"
+            f"S&P SL20: {overview['snp_sl20'].value:.2f} "
+            f"({overview['snp_sl20'].change:+.2f})"
         )
 
         # Example 3: Top gainers

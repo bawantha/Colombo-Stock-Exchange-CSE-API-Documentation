@@ -2,7 +2,7 @@
 
 import requests
 import time
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any
 from urllib.parse import urljoin
 
 from .models import (
@@ -21,7 +21,6 @@ from .models import (
     Announcement,
 )
 from .exceptions import (
-    CSEError,
     CSEAPIError,
     CSENetworkError,
     CSEValidationError,
@@ -122,7 +121,8 @@ class CSEClient:
                         error_data = {"error": response.text}
 
                     raise CSEAPIError(
-                        f"API request failed with status {response.status_code}: {response.text}",
+                        f"API request failed with status {response.status_code}: "
+                        f"{response.text}",
                         status_code=response.status_code,
                         response_data=error_data,
                     )
