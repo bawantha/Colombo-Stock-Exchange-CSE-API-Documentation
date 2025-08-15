@@ -45,11 +45,13 @@ setup(
     extras_require={
         "dev": [
             "pytest>=6.0",
-            "pytest-cov>=2.0",
+            "pytest-cov>=3.0",
             "black>=21.0",
             "flake8>=3.8",
             "mypy>=0.800",
             "pre-commit>=2.0",
+            "build>=0.8.0",
+            "twine>=4.0.0",
         ],
     },
     keywords="colombo stock exchange cse api finance sri lanka stocks trading",
