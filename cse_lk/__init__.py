@@ -56,7 +56,7 @@ __all__ = [
     "CSEClient",
     # Data models
     "CompanyInfo",
-    "TradeSummary", 
+    "TradeSummary",
     "SharePrice",
     "TopGainer",
     "TopLoser",
@@ -70,9 +70,9 @@ __all__ = [
     "Announcement",
     # Exceptions
     "CSEError",
-    "CSEAPIError", 
+    "CSEAPIError",
     "CSENetworkError",
     "CSEValidationError",
     "CSEAuthenticationError",
     "CSERateLimitError",
-] 
+]
