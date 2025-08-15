@@ -175,24 +175,32 @@ class CSEClient:
 
         return symbol
 
-    def _make_dict_request(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _make_dict_request(
+        self, endpoint: str, data: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Make a request expecting a dictionary response."""
         if data is not None:
             response = self._make_request(endpoint, data)
         else:
             response = self._make_request(endpoint)
         if not isinstance(response, dict):
-            raise CSEAPIError(f"Expected dictionary response from {endpoint}, got {type(response)}")
+            raise CSEAPIError(
+                f"Expected dictionary response from {endpoint}, got {type(response)}"
+            )
         return response
 
-    def _make_list_request(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> List[Any]:
+    def _make_list_request(
+        self, endpoint: str, data: Optional[Dict[str, Any]] = None
+    ) -> List[Any]:
         """Make a request expecting a list response."""
         if data is not None:
             response = self._make_request(endpoint, data)
         else:
             response = self._make_request(endpoint)
         if not isinstance(response, list):
-            raise CSEAPIError(f"Expected list response from {endpoint}, got {type(response)}")
+            raise CSEAPIError(
+                f"Expected list response from {endpoint}, got {type(response)}"
+            )
         return response
 
     # Market Data Methods
