@@ -2,7 +2,7 @@
 
 import requests
 import time
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 from urllib.parse import urljoin
 
 from .models import (
@@ -78,7 +78,7 @@ class CSEClient:
 
     def _make_request(
         self, endpoint: str, data: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+    ) -> Any:
         """
         Make a POST request to the CSE API with retry logic.
 
@@ -87,7 +87,7 @@ class CSEClient:
             data: Request data dictionary
 
         Returns:
-            Response data as dictionary
+            Response data as dictionary or list
 
         Raises:
             CSENetworkError: For network-related errors
@@ -129,7 +129,8 @@ class CSEClient:
 
                 # Parse JSON response
                 try:
-                    return response.json()
+                    json_response = response.json()
+                    return json_response
                 except ValueError as e:
                     raise CSEAPIError(f"Invalid JSON response: {e}")
 
@@ -174,6 +175,26 @@ class CSEClient:
 
         return symbol
 
+    def _make_dict_request(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Make a request expecting a dictionary response."""
+        if data is not None:
+            response = self._make_request(endpoint, data)
+        else:
+            response = self._make_request(endpoint)
+        if not isinstance(response, dict):
+            raise CSEAPIError(f"Expected dictionary response from {endpoint}, got {type(response)}")
+        return response
+
+    def _make_list_request(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> List[Any]:
+        """Make a request expecting a list response."""
+        if data is not None:
+            response = self._make_request(endpoint, data)
+        else:
+            response = self._make_request(endpoint)
+        if not isinstance(response, list):
+            raise CSEAPIError(f"Expected list response from {endpoint}, got {type(response)}")
+        return response
+
     # Market Data Methods
 
     def get_company_info(self, symbol: str) -> CompanyInfo:
@@ -192,7 +213,7 @@ class CSEClient:
         """
         symbol = self._validate_symbol(symbol)
         data = {"symbol": symbol}
-        response = self._make_request("companyInfoSummery", data)
+        response = self._make_dict_request("companyInfoSummery", data)
         return CompanyInfo.from_dict(response)
 
     def get_trade_summary(self) -> List[TradeSummary]:
@@ -202,7 +223,7 @@ class CSEClient:
         Returns:
             List of TradeSummary objects
         """
-        response = self._make_request("tradeSummary")
+        response = self._make_dict_request("tradeSummary")
         trade_summaries = response.get("reqTradeSummery", [])
         return [TradeSummary.from_dict(item) for item in trade_summaries]
 
@@ -213,11 +234,8 @@ class CSEClient:
         Returns:
             List of SharePrice objects
         """
-        response = self._make_request("todaySharePrice")
-        # Response is a direct list
-        if isinstance(response, list):
-            return [SharePrice.from_dict(item) for item in response]
-        return []
+        response = self._make_list_request("todaySharePrice")
+        return [SharePrice.from_dict(item) for item in response]
 
     def get_top_gainers(self) -> List[TopGainer]:
         """
@@ -226,10 +244,8 @@ class CSEClient:
         Returns:
             List of TopGainer objects
         """
-        response = self._make_request("topGainers")
-        if isinstance(response, list):
-            return [TopGainer.from_dict(item) for item in response]
-        return []
+        response = self._make_list_request("topGainers")
+        return [TopGainer.from_dict(item) for item in response]
 
     def get_top_losers(self) -> List[TopLoser]:
         """
@@ -238,10 +254,8 @@ class CSEClient:
         Returns:
             List of TopLoser objects
         """
-        response = self._make_request("topLooses")
-        if isinstance(response, list):
-            return [TopLoser.from_dict(item) for item in response]
-        return []
+        response = self._make_list_request("topLooses")
+        return [TopLoser.from_dict(item) for item in response]
 
     def get_most_active_trades(self) -> List[ActiveTrade]:
         """
@@ -250,10 +264,8 @@ class CSEClient:
         Returns:
             List of ActiveTrade objects
         """
-        response = self._make_request("mostActiveTrades")
-        if isinstance(response, list):
-            return [ActiveTrade.from_dict(item) for item in response]
-        return []
+        response = self._make_list_request("mostActiveTrades")
+        return [ActiveTrade.from_dict(item) for item in response]
 
     def get_market_status(self) -> MarketStatus:
         """
@@ -262,7 +274,7 @@ class CSEClient:
         Returns:
             MarketStatus object
         """
-        response = self._make_request("marketStatus")
+        response = self._make_dict_request("marketStatus")
         return MarketStatus.from_dict(response)
 
     def get_market_summary(self) -> MarketSummary:
@@ -272,7 +284,7 @@ class CSEClient:
         Returns:
             MarketSummary object
         """
-        response = self._make_request("marketSummery")
+        response = self._make_dict_request("marketSummery")
         return MarketSummary.from_dict(response)
 
     def get_aspi_data(self) -> IndexData:
@@ -282,7 +294,7 @@ class CSEClient:
         Returns:
             IndexData object with ASPI information
         """
-        response = self._make_request("aspiData")
+        response = self._make_dict_request("aspiData")
         return IndexData.from_dict(response)
 
     def get_snp_data(self) -> IndexData:
@@ -292,7 +304,7 @@ class CSEClient:
         Returns:
             IndexData object with S&P SL20 information
         """
-        response = self._make_request("snpData")
+        response = self._make_dict_request("snpData")
         return IndexData.from_dict(response)
 
     def get_chart_data(self, symbol: str) -> Dict[str, Any]:
@@ -309,7 +321,7 @@ class CSEClient:
         """
         symbol = self._validate_symbol(symbol)
         data = {"symbol": symbol}
-        return self._make_request("chartData", data)
+        return self._make_dict_request("chartData", data)
 
     def get_all_sectors(self) -> List[Sector]:
         """
@@ -318,10 +330,8 @@ class CSEClient:
         Returns:
             List of Sector objects
         """
-        response = self._make_request("allSectors")
-        if isinstance(response, list):
-            return [Sector.from_dict(item) for item in response]
-        return []
+        response = self._make_list_request("allSectors")
+        return [Sector.from_dict(item) for item in response]
 
     def get_detailed_trades(self, symbol: Optional[str] = None) -> List[DetailedTrade]:
         """
@@ -337,7 +347,7 @@ class CSEClient:
         if symbol:
             data["symbol"] = self._validate_symbol(symbol)
 
-        response = self._make_request("detailedTrades", data)
+        response = self._make_dict_request("detailedTrades", data)
         detailed_trades = response.get("reqDetailTrades", [])
         return [DetailedTrade.from_dict(item) for item in detailed_trades]
 
@@ -348,9 +358,9 @@ class CSEClient:
         Returns:
             List of DailyMarketSummary objects
         """
-        response = self._make_request("dailyMarketSummery")
+        response = self._make_list_request("dailyMarketSummery")
         # Response is nested list format
-        if isinstance(response, list) and response and isinstance(response[0], list):
+        if response and isinstance(response[0], list):
             return [DailyMarketSummary.from_dict(item) for item in response[0]]
         return []
 
@@ -363,7 +373,7 @@ class CSEClient:
         Returns:
             List of Announcement objects
         """
-        response = self._make_request("getNewListingsRelatedNoticesAnnouncements")
+        response = self._make_dict_request("getNewListingsRelatedNoticesAnnouncements")
         announcements = response.get("newListingRelatedAnnouncements", [])
         return [Announcement.from_dict(item) for item in announcements]
 
@@ -374,7 +384,7 @@ class CSEClient:
         Returns:
             List of Announcement objects
         """
-        response = self._make_request("getBuyInBoardAnnouncements")
+        response = self._make_dict_request("getBuyInBoardAnnouncements")
         announcements = response.get("buyInBoardAnnouncements", [])
         return [Announcement.from_dict(item) for item in announcements]
 
@@ -385,7 +395,7 @@ class CSEClient:
         Returns:
             List of Announcement objects
         """
-        response = self._make_request("approvedAnnouncement")
+        response = self._make_dict_request("approvedAnnouncement")
         announcements = response.get("approvedAnnouncements", [])
         return [Announcement.from_dict(item) for item in announcements]
 
@@ -396,7 +406,7 @@ class CSEClient:
         Returns:
             List of Announcement objects
         """
-        response = self._make_request("getCOVIDAnnouncements")
+        response = self._make_dict_request("getCOVIDAnnouncements")
         announcements = response.get("covidAnnouncements", [])
         return [Announcement.from_dict(item) for item in announcements]
 
@@ -407,7 +417,7 @@ class CSEClient:
         Returns:
             List of Announcement objects
         """
-        response = self._make_request("getFinancialAnnouncement")
+        response = self._make_dict_request("getFinancialAnnouncement")
         announcements = response.get("reqFinancialAnnouncemnets", [])
         return [Announcement.from_dict(item) for item in announcements]
 
@@ -418,7 +428,7 @@ class CSEClient:
         Returns:
             List of Announcement objects
         """
-        response = self._make_request("circularAnnouncement")
+        response = self._make_dict_request("circularAnnouncement")
         announcements = response.get("reqCircularAnnouncement", [])
         return [Announcement.from_dict(item) for item in announcements]
 
@@ -429,7 +439,7 @@ class CSEClient:
         Returns:
             List of Announcement objects
         """
-        response = self._make_request("directiveAnnouncement")
+        response = self._make_dict_request("directiveAnnouncement")
         announcements = response.get("reqDirectiveAnnouncement", [])
         return [Announcement.from_dict(item) for item in announcements]
 
@@ -440,7 +450,7 @@ class CSEClient:
         Returns:
             List of Announcement objects
         """
-        response = self._make_request("getNonComplianceAnnouncements")
+        response = self._make_dict_request("getNonComplianceAnnouncements")
         announcements = response.get("nonComplianceAnnouncements", [])
         return [Announcement.from_dict(item) for item in announcements]
 
@@ -488,6 +498,6 @@ class CSEClient:
         """Context manager entry."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Context manager exit."""
         self.session.close()
