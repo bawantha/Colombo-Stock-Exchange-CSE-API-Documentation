@@ -2,7 +2,7 @@
 
 import requests
 import time
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any
 from urllib.parse import urljoin
 
 from .models import (
