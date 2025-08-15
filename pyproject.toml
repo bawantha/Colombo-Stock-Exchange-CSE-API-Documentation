@@ -38,6 +38,11 @@ warn_no_return = true
 warn_unreachable = true
 strict_equality = true
 
+# Handle requests library when types-requests is not available
+[[tool.mypy.overrides]]
+module = "requests.*"
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q --strict-markers"
